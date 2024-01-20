@@ -1,13 +1,16 @@
-version: '3'
+version: '3.8'
 
 services:
-  db:
+  mysql:
     image: mysql:latest
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=app
+      MYSQL_ROOT_PASSWORD: root
     command: --init-file /data/application/init.sql
     volumes:
+      - mysql_data:/var/lib/mysql
       - ./init.sql:/data/application/init.sql
+
+volumes:
+  mysql_data:

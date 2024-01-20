@@ -1,8 +1,6 @@
-DROP
-DATABASE IF EXISTS APP;
-CREATE
-DATABASE APP;
-USE APP;
+DROP DATABASE IF EXISTS app;
+CREATE DATABASE app;
+USE app;
 CREATE TABLE user
 (
     id           BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -27,7 +25,12 @@ CREATE TABLE address
     created_on    DATETIME,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
-
+CREATE TABLE category
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name       VARCHAR(255),
+    created_on DATETIME
+);
 CREATE TABLE item
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -38,13 +41,6 @@ CREATE TABLE item
     category_id BIGINT,
     created_on  DATETIME,
     FOREIGN KEY (category_id) REFERENCES category (id)
-);
-
-CREATE TABLE category
-(
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name       VARCHAR(255),
-    created_on DATETIME
 );
 
 CREATE TABLE cart
