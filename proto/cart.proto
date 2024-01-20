@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package ecommerce;
+
+service CartService {
+  rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+  rpc GetCart(GetCartRequest) returns (GetCartResponse);
+  rpc AddItem(AddItemRequest) returns (AddItemResponse);
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemRequest);
+}
+
+message Cart {
+  string id = 1;
+  string user_id = 2;
+  repeated Item items = 3;
+}
+
+message GetCartRequest {}
+
+message GetCartResponse {
+  Cart cart = 1;
+}
+
+message AddItemRequest {
+  string item_id = 1;
+  string cart_id = 2;
+  int32 quantity = 3;
+}
+
+message AddItemResponse {
+  ResponseStatus response_status = 1;
+}
+
+message DeleteItemRequest {
+  string item_id = 1;
+  string cart_id = 2;
+}
+
+message DeleteItemResponse {
+  ResponseStatus response_status = 1;
+}
+
+
+message Item {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  float price = 4;
+  Category category = 5;
+}
+
+message Category {
+  string id = 1;
+  string name = 2;
+}
+
+message GetCategoriesRequest {}
+
+message GetCategoriesResponse {
+  repeated Category category = 1;
+  ResponseStatus response_status = 2;
+}
+
+message ResponseStatus {
+  bool success = 1;
+  string message = 2;
+}
