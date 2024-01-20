@@ -1,6 +1,9 @@
+//protoc --go_out=proto_out --go-grpc_out=proto_out --proto_path=proto proto/*.proto
 syntax = "proto3";
 
 package ecommerce;
+
+option go_package = "auth/";
 
 service AuthService {
   rpc Login (LoginRequest) returns (LoginResponse) {}

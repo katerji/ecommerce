@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package ecommerce;
 
+option go_package = "cart/";
+
 service CartService {
   rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
   rpc GetCart(GetCartRequest) returns (GetCartResponse);
