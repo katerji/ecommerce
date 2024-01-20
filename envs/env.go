@@ -6,6 +6,18 @@ import (
 	"path/filepath"
 )
 
+const (
+	defaultDBHost           = "127.0.0.1"
+	defaultDBPort           = "3306"
+	defaultDBUser           = "root"
+	defaultDBPassword       = "root"
+	defaultDBDatabase       = "app"
+	defaultJWTSecret        = "dummy"
+	defaultJWTExpiry        = 86400
+	defaultRefreshJWTSecret = "dummy_refresh"
+	defaultRefreshJWTExpiry = 1209600
+)
+
 type Env struct {
 	jWTToken        string
 	jWTRefreshToken string
@@ -16,16 +28,24 @@ type Env struct {
 	dbName          string
 }
 
+func getFromEnv(key string, defaultValue string) string {
+	value := os.Getenv(key)
+	if value != "" {
+		return value
+	}
+	return defaultValue
+}
+
 func newEnv() *Env {
 	loadEnv()
 	return &Env{
-		jWTToken:        os.Getenv("JWT_SECRET"),
-		jWTRefreshToken: os.Getenv("JWT_REFRESH_SECRET"),
-		dbHost:          os.Getenv("DB_HOST"),
-		dbPassword:      os.Getenv("DB_PASSWORD"),
-		dbUser:          os.Getenv("DB_USERNAME"),
-		dbPort:          os.Getenv("DB_PORT"),
-		dbName:          os.Getenv("DB_DATABASE"),
+		jWTToken:        getFromEnv("JWT_SECRET", defaultJWTSecret),
+		jWTRefreshToken: getFromEnv("JWT_REFRESH_SECRET", defaultRefreshJWTSecret),
+		dbHost:          getFromEnv("DB_HOST", defaultDBHost),
+		dbPassword:      getFromEnv("DB_PASSWORD", defaultDBPassword),
+		dbUser:          getFromEnv("DB_USERNAME", defaultDBUser),
+		dbPort:          getFromEnv("DB_PORT", defaultDBPort),
+		dbName:          getFromEnv("DB_DATABASE", defaultDBDatabase),
 	}
 }
 
@@ -68,16 +88,14 @@ func GetInstance() *Env {
 
 func loadEnv() {
 	err := godotenv.Load()
-
-	if err != nil {
-		execPath, err := os.Executable()
-		if err != nil {
-			panic(err)
-		}
-		envPath := filepath.Join(filepath.Dir(execPath), ".env")
-		err = godotenv.Load(envPath)
-		if err != nil {
-			panic(err)
-		}
+	if err == nil {
+		return
 	}
+
+	execPath, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	envPath := filepath.Join(filepath.Dir(execPath), ".env")
+	godotenv.Load(envPath)
 }
