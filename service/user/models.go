@@ -57,3 +57,11 @@ func (a dbAddress) ToModel() any {
 		Country:      a.Country,
 	}
 }
+
+type SignupResult struct {
+	User                  *User
+	AccessToken           string
+	ExpiresAt             string
+	RefreshToken          string
+	RefreshTokenExpiresAt string
+}

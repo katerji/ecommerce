@@ -28,7 +28,7 @@ func randomAddress(userID int) Address {
 
 func TestInsertUser(t *testing.T) {
 	user := randomUser()
-	newUser, ok := repo{}.insertUser(user, "pass")
+	newUser, ok := repo{}.insertUser(&user, "pass")
 	if !ok {
 		t.Fatal("failed to insert user")
 	}
@@ -49,7 +49,7 @@ func TestInsertUser(t *testing.T) {
 func TestSelectByEmail(t *testing.T) {
 	user := randomUser()
 	r := repo{}
-	r.insertUser(user, "pass")
+	r.insertUser(&user, "pass")
 
 	fetchedUser, ok := r.fetchUserByEmail(user.Email)
 	if !ok {
@@ -73,7 +73,7 @@ func TestSelectByEmail(t *testing.T) {
 func TestSelectByPhoneNumber(t *testing.T) {
 	user := randomUser()
 	r := repo{}
-	r.insertUser(user, "pass")
+	r.insertUser(&user, "pass")
 
 	fetchedUser, ok := r.fetchUserByPhoneNumber(user.PhoneNumber)
 	if !ok {

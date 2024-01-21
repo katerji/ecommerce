@@ -13,19 +13,21 @@ const (
 	defaultDBPassword       = "root"
 	defaultDBDatabase       = "app"
 	defaultJWTSecret        = "dummy"
-	defaultJWTExpiry        = 86400
+	defaultJWTExpiry        = "86400"
 	defaultRefreshJWTSecret = "dummy_refresh"
-	defaultRefreshJWTExpiry = 1209600
+	defaultRefreshJWTExpiry = "1209600"
 )
 
-type Env struct {
-	jWTToken        string
-	jWTRefreshToken string
-	dbHost          string
-	dbPassword      string
-	dbUser          string
-	dbPort          string
-	dbName          string
+type env struct {
+	jwtSecret        string
+	jwtExpiry        string
+	jwtRefreshSecret string
+	jwtRefreshExpiry string
+	dbHost           string
+	dbPassword       string
+	dbUser           string
+	dbPort           string
+	dbName           string
 }
 
 func getFromEnv(key string, defaultValue string) string {
@@ -36,50 +38,60 @@ func getFromEnv(key string, defaultValue string) string {
 	return defaultValue
 }
 
-func newEnv() *Env {
+func newEnv() *env {
 	loadEnv()
-	return &Env{
-		jWTToken:        getFromEnv("JWT_SECRET", defaultJWTSecret),
-		jWTRefreshToken: getFromEnv("JWT_REFRESH_SECRET", defaultRefreshJWTSecret),
-		dbHost:          getFromEnv("DB_HOST", defaultDBHost),
-		dbPassword:      getFromEnv("DB_PASSWORD", defaultDBPassword),
-		dbUser:          getFromEnv("DB_USERNAME", defaultDBUser),
-		dbPort:          getFromEnv("DB_PORT", defaultDBPort),
-		dbName:          getFromEnv("DB_DATABASE", defaultDBDatabase),
+	return &env{
+		jwtSecret:        getFromEnv("JWT_SECRET", defaultJWTSecret),
+		jwtExpiry:        getFromEnv("JWT_EXPIRY", defaultJWTExpiry),
+		jwtRefreshSecret: getFromEnv("JWT_REFRESH_SECRET", defaultRefreshJWTSecret),
+		jwtRefreshExpiry: getFromEnv("JWT_REFRESH_EXPIRY", defaultRefreshJWTExpiry),
+		dbHost:           getFromEnv("DB_HOST", defaultDBHost),
+		dbPassword:       getFromEnv("DB_PASSWORD", defaultDBPassword),
+		dbUser:           getFromEnv("DB_USERNAME", defaultDBUser),
+		dbPort:           getFromEnv("DB_PORT", defaultDBPort),
+		dbName:           getFromEnv("DB_DATABASE", defaultDBDatabase),
 	}
 }
 
-func (env *Env) GetJWTToken() string {
-	return env.jWTToken
+func (env *env) GetJWTSecret() string {
+	return env.jwtSecret
 }
 
-func (env *Env) GetJWTRefreshToken() string {
-	return env.jWTRefreshToken
+func (env *env) GetJWTExpiry() string {
+	return env.jwtExpiry
 }
 
-func (env *Env) GetDbHost() string {
+func (env *env) GetJWTRefreshSecret() string {
+	return env.jwtRefreshSecret
+}
+
+func (env *env) GetJWTRefreshExpiry() string {
+	return env.jwtExpiry
+}
+
+func (env *env) GetDbHost() string {
 	return env.dbHost
 }
 
-func (env *Env) GetDbPassword() string {
+func (env *env) GetDbPassword() string {
 	return env.dbPassword
 }
 
-func (env *Env) GetDbUser() string {
+func (env *env) GetDbUser() string {
 	return env.dbUser
 }
 
-func (env *Env) GetDbPort() string {
+func (env *env) GetDbPort() string {
 	return env.dbPort
 }
 
-func (env *Env) GetDbName() string {
+func (env *env) GetDbName() string {
 	return env.dbName
 }
 
-var instance *Env
+var instance *env
 
-func GetInstance() *Env {
+func GetInstance() *env {
 	if instance == nil {
 		instance = newEnv()
 	}
