@@ -1,0 +1,89 @@
+//protoc --go_out=proto_out --go-grpc_out=proto_out --proto_path=proto proto/*.proto
+syntax = "proto3";
+
+package ecommerce;
+
+option go_package = "user/";
+
+import "response.proto";
+
+service UserService {
+  rpc Login (LoginRequest) returns (LoginResponse) {}
+  rpc Logout (LogoutRequest) returns (LogoutResponse) {}
+  rpc GetAddresses (GetAddressesRequest) returns (GetAddressesResponse) {}
+  rpc CreateAddresses (CreateAddressRequest) returns (CreateAddressResponse) {}
+  rpc UpdateAddresses (UpdateAddressRequest) returns (UpdateAddressResponse) {}
+  rpc DeleteAddresses (DeleteAddressRequest) returns (DeleteAddressResponse) {}
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+  string phone_number = 4;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  User user = 3;
+  string access_token = 4;
+  string refresh_token = 5;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message User {
+  int64 id = 1;
+  string email = 2;
+  string name = 3;
+  string phone_number = 4;
+}
+
+message Address {
+  int64 id = 1;
+  int64 user_id = 2;
+  string address_line_1 = 3;
+  string address_line_2 = 4;
+  string country = 5;
+  string city = 6;
+  string state = 7;
+  string zip_code = 8;
+}
+
+message GetAddressesRequest{}
+
+message GetAddressesResponse{
+  repeated Address addresses = 1;
+  ResponseStatus response_status = 2;
+}
+
+message CreateAddressRequest{
+  Address address = 1;
+}
+
+message CreateAddressResponse{
+  Address address = 1;
+  ResponseStatus response_status = 2;
+}
+
+message UpdateAddressRequest{
+  Address address = 1;
+}
+
+message UpdateAddressResponse{
+  Address address = 1;
+  ResponseStatus response_status = 2;
+}
+message DeleteAddressRequest{
+  int64 address_id = 1;
+}
+
+message DeleteAddressResponse{
+  ResponseStatus response_status = 1;
+}

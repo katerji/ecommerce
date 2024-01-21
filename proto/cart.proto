@@ -4,6 +4,8 @@ package ecommerce;
 
 option go_package = "cart/";
 
+import "response.proto";
+
 service CartService {
   rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
   rpc GetCart(GetCartRequest) returns (GetCartResponse);
@@ -63,7 +65,3 @@ message GetCategoriesResponse {
   ResponseStatus response_status = 2;
 }
 
-message ResponseStatus {
-  bool success = 1;
-  string message = 2;
-}

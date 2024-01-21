@@ -1,0 +1,10 @@
+syntax="proto3";
+
+package ecommerce;
+
+option go_package = "response/";
+
+message ResponseStatus {
+  bool success = 1;
+  string message = 2;
+}

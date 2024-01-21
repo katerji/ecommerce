@@ -4,6 +4,7 @@ package ecommerce;
 
 option go_package = "order/";
 
+import "response.proto";
 import "cart.proto";
 
 service OrderService {
