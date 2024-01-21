@@ -27,7 +27,7 @@ func TestService_LoginWithEmail(t *testing.T) {
 	}
 
 	email := result.User.Email
-	result, err = s.LoginWithEmail(email)
+	result, err = s.LoginWithEmail(email, p)
 	if err != nil {
 		t.Fatalf("failed to login with err: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestService_LoginWithPhone(t *testing.T) {
 	}
 
 	phoneNumber := result.User.PhoneNumber
-	result, err = s.LoginWithPhoneNumber(phoneNumber)
+	result, err = s.LoginWithPhoneNumber(phoneNumber, p)
 	if err != nil {
 		t.Fatalf("failed to login with err: %v", err)
 	}
@@ -84,11 +84,11 @@ func TestService_VerifyJWT(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to signup user with err: %v", err)
 	}
-	_, err = s.verifyToken(result.jwtPair.AccessToken)
+	_, err = s.verifyToken(result.JWTPair.AccessToken)
 	if err != nil {
 		t.Errorf("failed to verify access token with err: %v", err)
 	}
-	_, err = s.verifyRefreshToken(result.jwtPair.RefreshToken)
+	_, err = s.verifyRefreshToken(result.JWTPair.RefreshToken)
 	if err != nil {
 		t.Errorf("failed to verify refresh token with err: %v", err)
 	}

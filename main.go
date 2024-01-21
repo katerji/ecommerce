@@ -12,11 +12,14 @@ import (
 
 func main() {
 	s := grpc.NewServer()
+
 	generated.RegisterUserServiceServer(s, server.NewUserServer())
+
 	lis, err := net.Listen("tcp", ":9999")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
+
 	reflection.Register(s)
 
 	fmt.Printf("Server is listening on %s...\n", ":9999")

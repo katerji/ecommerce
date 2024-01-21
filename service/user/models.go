@@ -7,19 +7,29 @@ type User struct {
 	PhoneNumber string `json:"phone_number"`
 }
 
+type UserWithPass struct {
+	*User
+	Password string
+}
+
 type dbUser struct {
 	ID          uint   `db:"id"`
 	Email       string `db:"email"`
 	Name        string `db:"name"`
 	PhoneNumber string `db:"phone_number"`
+	Password    string `db:"password"`
 }
 
 func (u dbUser) ToModel() any {
-	return User{
+	user := &User{
 		ID:          int(u.ID),
 		Email:       u.Email,
 		Name:        u.Name,
 		PhoneNumber: u.PhoneNumber,
+	}
+	return UserWithPass{
+		User:     user,
+		Password: u.Password,
 	}
 }
 
@@ -67,5 +77,5 @@ type JWTPair struct {
 
 type LoginResult struct {
 	User    *User
-	jwtPair *JWTPair
+	JWTPair *JWTPair
 }

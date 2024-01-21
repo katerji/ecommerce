@@ -4,13 +4,13 @@ import "github.com/katerji/ecommerce/db"
 
 type repo struct{}
 
-func (repo) fetchUserByEmail(email string) (*User, bool) {
-	user, ok := db.FetchOne[dbUser, User](fetchUserByEmailQuery, email)
+func (repo) fetchUserByEmail(email string) (*UserWithPass, bool) {
+	user, ok := db.FetchOne[dbUser, UserWithPass](fetchUserByEmailQuery, email)
 	return &user, ok
 }
 
-func (repo) fetchUserByPhoneNumber(phoneNumber string) (*User, bool) {
-	user, ok := db.FetchOne[dbUser, User](fetchUserByPhoneNumberQuery, phoneNumber)
+func (repo) fetchUserByPhoneNumber(phoneNumber string) (*UserWithPass, bool) {
+	user, ok := db.FetchOne[dbUser, UserWithPass](fetchUserByPhoneNumberQuery, phoneNumber)
 	return &user, ok
 }
 

@@ -5,6 +5,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	emailNotFoundErr       = errors.New("email not found")
+	phoneNumberNotFoundErr = errors.New("phone number not found")
+	incorrectPasswordErr   = errors.New("incorrect password")
+)
+
 type Service struct {
 	repo *repo
 }
@@ -15,19 +21,24 @@ func New() *Service {
 	}
 }
 
-func (s *Service) getUserByEmail(email string) (*User, bool) {
+func (s *Service) getUserByEmail(email string) (*UserWithPass, bool) {
 	return s.repo.fetchUserByEmail(email)
 }
 
-func (s *Service) getUserByPhoneNumber(phoneNumber string) (*User, bool) {
+func (s *Service) getUserByPhoneNumber(phoneNumber string) (*UserWithPass, bool) {
 	return s.repo.fetchUserByPhoneNumber(phoneNumber)
 }
 
-func (s *Service) LoginWithEmail(email string) (*LoginResult, error) {
-	user, ok := s.getUserByEmail(email)
-	if !ok || user == nil {
-
+func (s *Service) LoginWithEmail(email string, password string) (*LoginResult, error) {
+	userWithPass, ok := s.getUserByEmail(email)
+	if !ok || userWithPass == nil {
+		return nil, emailNotFoundErr
 	}
+
+	if !validPassword(userWithPass.Password, password) {
+		return nil, incorrectPasswordErr
+	}
+	user := userWithPass.User
 
 	pair, err := s.createJwt(user)
 	if err != nil {
@@ -35,15 +46,20 @@ func (s *Service) LoginWithEmail(email string) (*LoginResult, error) {
 	}
 	return &LoginResult{
 		User:    user,
-		jwtPair: pair,
+		JWTPair: pair,
 	}, nil
 }
 
-func (s *Service) LoginWithPhoneNumber(phoneNumber string) (*LoginResult, error) {
-	user, ok := s.getUserByPhoneNumber(phoneNumber)
-	if !ok || user == nil {
-		return nil, errors.New("account not found")
+func (s *Service) LoginWithPhoneNumber(phoneNumber string, password string) (*LoginResult, error) {
+	userWithPass, ok := s.getUserByPhoneNumber(phoneNumber)
+	if !ok || userWithPass == nil {
+		return nil, phoneNumberNotFoundErr
 	}
+
+	if !validPassword(userWithPass.Password, password) {
+		return nil, incorrectPasswordErr
+	}
+	user := userWithPass.User
 
 	pair, err := s.createJwt(user)
 	if err != nil {
@@ -51,7 +67,7 @@ func (s *Service) LoginWithPhoneNumber(phoneNumber string) (*LoginResult, error)
 	}
 	return &LoginResult{
 		User:    user,
-		jwtPair: pair,
+		JWTPair: pair,
 	}, nil
 }
 
@@ -71,7 +87,7 @@ func (s *Service) Signup(user *User, password string) (*LoginResult, error) {
 
 	return &LoginResult{
 		User:    user,
-		jwtPair: jwtPair,
+		JWTPair: jwtPair,
 	}, nil
 }
 

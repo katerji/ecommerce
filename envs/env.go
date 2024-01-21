@@ -66,7 +66,7 @@ func (env *env) GetJWTRefreshSecret() string {
 }
 
 func (env *env) GetJWTRefreshExpiry() string {
-	return env.jwtExpiry
+	return env.jwtRefreshExpiry
 }
 
 func (env *env) GetDbHost() string {
