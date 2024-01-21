@@ -44,10 +44,6 @@ func getDbClient() (*Client, error) {
 	}, nil
 }
 
-type Reader interface {
-	ToStruct() any
-}
-
 func Fetch[T Reader, W any](query string, args ...any) []W {
 	client := getDbInstance()
 
@@ -62,43 +58,43 @@ func Fetch[T Reader, W any](query string, args ...any) []W {
 
 	var returns []W
 	for _, m := range dbModels {
-		returns = append(returns, m.ToStruct().(W))
+		returns = append(returns, m.ToModel().(W))
 	}
 
 	return returns
 }
 
-func FetchOne[T Reader, W any](query string, args ...any) W {
+func FetchOne[T Reader, W any](query string, args ...any) (W, bool) {
 	client := getDbInstance()
 
 	var dbModel T
 	err := client.Get(&dbModel, query, args...)
 	if err != nil {
 		fmt.Println(err)
-
+		return dbModel.ToModel().(W), false
 	}
-	return dbModel.ToStruct().(W)
+	return dbModel.ToModel().(W), true
 }
 
-func Insert(query string, args ...any) int64 {
+func Insert(query string, args ...any) (int, bool) {
 	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0
+		return 0, false
 	}
 	result, err := prepare.Exec(args...)
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0
+		return 0, false
 	}
 	insertID, err := result.LastInsertId()
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0
+		return 0, false
 	}
 
-	return insertID
+	return int(insertID), true
 }
 
 func Update(query string, args ...any) bool {
