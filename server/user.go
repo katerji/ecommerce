@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/katerji/ecommerce/proto_out/generated"
+	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
 )
 
@@ -12,9 +14,8 @@ type UserServer struct {
 }
 
 func NewUserServer() UserServer {
-	s := user.New()
 	return UserServer{
-		service: s,
+		service: service.GetServiceContainerInstance().UserServer,
 	}
 }
 
@@ -58,6 +59,7 @@ func (s UserServer) Login(_ context.Context, request *generated.LoginRequest) (*
 		RefreshExpiresAt: result.JWTPair.RefreshExpiresAt,
 	}, nil
 }
+
 func (s UserServer) Signup(_ context.Context, request *generated.SignupRequest) (*generated.SignupResponse, error) {
 	isOneSet := request.Email != "" || request.PhoneNumber != ""
 	if !isOneSet || request.Name == "" || request.Password == "" {
@@ -87,10 +89,14 @@ func (s UserServer) Signup(_ context.Context, request *generated.SignupRequest) 
 		RefreshExpiresAt: result.JWTPair.RefreshExpiresAt,
 	}, nil
 }
+
 func (s UserServer) Logout(_ context.Context, _ *generated.LogoutRequest) (*generated.LogoutResponse, error) {
 	return nil, nil
 }
-func (s UserServer) GetAddresses(_ context.Context, _ *generated.GetAddressesRequest) (*generated.GetAddressesResponse, error) {
+
+func (s UserServer) GetAddresses(ctx context.Context, _ *generated.GetAddressesRequest) (*generated.GetAddressesResponse, error) {
+	user := GetUser(ctx)
+	fmt.Println(user)
 	return nil, nil
 }
 func (s UserServer) CreateAddresses(_ context.Context, _ *generated.CreateAddressRequest) (*generated.CreateAddressResponse, error) {

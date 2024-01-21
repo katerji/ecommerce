@@ -15,10 +15,8 @@ type Service struct {
 	repo *repo
 }
 
-func New() *Service {
-	return &Service{
-		repo: &repo{},
-	}
+func (s *Service) InitService() {
+	s.repo = &repo{}
 }
 
 func (s *Service) getUserByEmail(email string) (*UserWithPass, bool) {

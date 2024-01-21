@@ -15,7 +15,7 @@ type claims struct {
 	ExpiresAt int64 `json:"expires_at"`
 }
 
-func (s *Service) verifyToken(token string) (*User, error) {
+func (s *Service) VerifyAccessToken(token string) (*User, error) {
 	jwtSecret := envs.GetInstance().GetJWTSecret()
 	return s.validateToken(token, jwtSecret)
 }

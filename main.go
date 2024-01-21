@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	s := grpc.NewServer()
-
+	s := grpc.NewServer(grpc.UnaryInterceptor(server.AuthInterceptor))
 	generated.RegisterUserServiceServer(s, server.NewUserServer())
 
 	lis, err := net.Listen("tcp", ":9999")
