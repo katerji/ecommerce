@@ -44,7 +44,7 @@ func getDbClient() (*Client, error) {
 	}, nil
 }
 
-func Fetch[T Reader, W any](query string, args ...any) []W {
+func Fetch[T Reader, W any](query string, args ...any) ([]W, error) {
 	client := getDbInstance()
 
 	var dbModels []T
@@ -53,7 +53,7 @@ func Fetch[T Reader, W any](query string, args ...any) []W {
 
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return nil, err
 	}
 
 	var returns []W
@@ -61,7 +61,7 @@ func Fetch[T Reader, W any](query string, args ...any) []W {
 		returns = append(returns, m.ToModel().(W))
 	}
 
-	return returns
+	return returns, nil
 }
 
 func FetchOne[T Reader, W any](query string, args ...any) (W, bool) {

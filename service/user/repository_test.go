@@ -14,8 +14,8 @@ func randomUser() User {
 	}
 }
 
-func randomAddress(userID int) Address {
-	return Address{
+func randomAddress(userID int) *Address {
+	return &Address{
 		UserID:       userID,
 		AddressLine1: fmt.Sprintf("%s", uuid.NewString()[0:4]),
 		AddressLine2: fmt.Sprintf("%s", uuid.NewString()[0:4]),
@@ -96,7 +96,7 @@ func TestSelectByPhoneNumber(t *testing.T) {
 func Test_repo_insertAddress(t *testing.T) {
 	tests := []struct {
 		name            string
-		expectedAddress Address
+		expectedAddress *Address
 		want            bool
 	}{
 		{
@@ -117,7 +117,11 @@ func Test_repo_insertAddress(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("insertAddress() = %v, want %v", got, tt.want)
 			}
-			insertedAddress := re.fetchAddresses(tt.expectedAddress.UserID)[ad.ID]
+			allAddresses, err := re.fetchAddresses(tt.expectedAddress.UserID)
+			if err != nil {
+				t.Errorf("failed to fetch addresses with error: %v", err)
+			}
+			insertedAddress := allAddresses[ad.ID]
 			if tt.expectedAddress.AddressLine1 != insertedAddress.AddressLine1 {
 				t.Errorf("AddressLine1 mismatch: got %v, want %v", insertedAddress.AddressLine1, tt.expectedAddress.AddressLine1)
 			}
@@ -151,12 +155,12 @@ func Test_repo_insertAddress(t *testing.T) {
 func Test_repo_updateAddress(t *testing.T) {
 	tests := []struct {
 		name            string
-		expectedAddress Address
+		expectedAddress *Address
 		want            bool
 	}{
 		{
 			"test 1",
-			Address{
+			&Address{
 				ID:           1,
 				UserID:       1,
 				AddressLine1: "123",
@@ -170,7 +174,7 @@ func Test_repo_updateAddress(t *testing.T) {
 		},
 		{
 			"test 2",
-			Address{
+			&Address{
 				ID:           2,
 				UserID:       1,
 				AddressLine1: "new add",
@@ -189,7 +193,11 @@ func Test_repo_updateAddress(t *testing.T) {
 			if got := re.updateAddress(tt.expectedAddress); got != tt.want {
 				t.Errorf("updateAddress() = %v, want %v", got, tt.want)
 			}
-			updatedAddress := re.fetchAddresses(tt.expectedAddress.UserID)[tt.expectedAddress.ID]
+			allAddresses, err := re.fetchAddresses(tt.expectedAddress.UserID)
+			if err != nil {
+				t.Fatalf("failed to fetch addresses with err: %v", err)
+			}
+			updatedAddress := allAddresses[tt.expectedAddress.ID]
 			if tt.expectedAddress.AddressLine1 != updatedAddress.AddressLine1 {
 				t.Errorf("AddressLine1 mismatch: got %v, want %v", updatedAddress.AddressLine1, tt.expectedAddress.AddressLine1)
 			}
@@ -221,7 +229,7 @@ func Test_repo_updateAddress(t *testing.T) {
 func Test_repo_deleteAddress(t *testing.T) {
 	tests := []struct {
 		name            string
-		expectedAddress Address
+		expectedAddress *Address
 		want            bool
 	}{
 		{

@@ -29,7 +29,7 @@ type user struct {
 	Email string
 }
 
-func (u dbUser) ToStruct() any {
+func (u dbUser) ToModel() any {
 	return user{
 		ID:    u.ID,
 		Name:  u.Name,
@@ -38,7 +38,10 @@ func (u dbUser) ToStruct() any {
 
 }
 func TestFetch(t *testing.T) {
-	users := Fetch[dbUser, user]("SELECT id, email FROM user LIMIT 50")
+	users, err := Fetch[dbUser, user]("SELECT id, email FROM user LIMIT 50")
+	if err != nil {
+		t.Fatalf("failed to fetch users with err: %v", err)
+	}
 	for _, u := range users {
 		fmt.Println(u.ID)
 		fmt.Println(u.Name)
@@ -47,7 +50,10 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchOne(t *testing.T) {
-	u := FetchOne[dbUser, user]("SELECT id, email FROM user LIMIT 50")
+	u, ok := FetchOne[dbUser, user]("SELECT id, email FROM user LIMIT 50")
+	if !ok {
+		t.Fatal("failed to fetch users")
+	}
 	fmt.Println(u.ID)
 	fmt.Println(u.Name)
 	fmt.Println(u.Email)

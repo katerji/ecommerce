@@ -1,6 +1,8 @@
 package user
 
-import "github.com/katerji/ecommerce/db"
+import (
+	"github.com/katerji/ecommerce/db"
+)
 
 type repo struct{}
 
@@ -21,14 +23,14 @@ func (repo) insertUser(user *User, password string) (*User, bool) {
 	return user, ok
 }
 
-func (repo) insertAddress(address Address) (Address, bool) {
+func (repo) insertAddress(address *Address) (*Address, bool) {
 	addressID, ok := db.Insert(insertAddressQuery, address.UserID, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode)
 	address.ID = addressID
 
 	return address, ok
 }
 
-func (repo) updateAddress(address Address) bool {
+func (repo) updateAddress(address *Address) bool {
 	return db.Update(updateAddressQuery, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode, address.ID)
 }
 
@@ -36,13 +38,15 @@ func (repo) deleteAddress(addressID int) bool {
 	return db.Delete(deleteAddressQuery, addressID)
 }
 
-func (repo) fetchAddresses(userID int) map[int]Address {
-	addresses := db.Fetch[dbAddress, Address](fetchAddressesQuery, userID)
-
+func (repo) fetchAddresses(userID int) (map[int]Address, error) {
+	addresses, err := db.Fetch[dbAddress, Address](fetchAddressesQuery, userID)
+	if err != nil {
+		return nil, err
+	}
 	addressMap := make(map[int]Address, len(addresses))
 	for _, a := range addresses {
 		addressMap[a.ID] = a
 	}
 
-	return addressMap
+	return addressMap, nil
 }

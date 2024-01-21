@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/katerji/ecommerce/proto_out/generated"
 	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
@@ -95,18 +94,122 @@ func (s UserServer) Logout(_ context.Context, _ *generated.LogoutRequest) (*gene
 }
 
 func (s UserServer) GetAddresses(ctx context.Context, _ *generated.GetAddressesRequest) (*generated.GetAddressesResponse, error) {
-	user := GetUser(ctx)
-	fmt.Println(user)
-	return nil, nil
+	u := GetUser(ctx)
+	addressesMap, err := s.service.GetAddresses(u.ID)
+	if err != nil {
+		return &generated.GetAddressesResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "something went wrong",
+			},
+		}, nil
+	}
+	addresses := []*generated.Address{}
+	for _, a := range addressesMap {
+		addresses = append(addresses, addressToProto(&a))
+	}
+
+	return &generated.GetAddressesResponse{
+		Addresses: addresses,
+		ResponseStatus: &generated.ResponseStatus{
+			Success: true,
+		},
+	}, nil
 }
-func (s UserServer) CreateAddresses(_ context.Context, _ *generated.CreateAddressRequest) (*generated.CreateAddressResponse, error) {
-	return nil, nil
+
+func (s UserServer) CreateAddresses(ctx context.Context, request *generated.CreateAddressRequest) (*generated.CreateAddressResponse, error) {
+	u := GetUser(ctx)
+	address := &user.Address{
+		UserID:       u.ID,
+		AddressLine1: request.Address.AddressLine_1,
+		AddressLine2: request.Address.AddressLine_2,
+		City:         request.Address.City,
+		State:        request.Address.State,
+		ZipCode:      request.Address.ZipCode,
+		Country:      request.Address.Country,
+	}
+	if address.AddressLine1 == "" || address.City == "" || address.Country == "" {
+		return &generated.CreateAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "missing params",
+			},
+		}, nil
+	}
+	insertedAddress, ok := s.service.CreateAddress(address)
+	if !ok {
+		return &generated.CreateAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "something went wrong",
+			},
+		}, nil
+	}
+	return &generated.CreateAddressResponse{
+		Address: addressToProto(insertedAddress),
+		ResponseStatus: &generated.ResponseStatus{
+			Success: true,
+		},
+	}, nil
 }
-func (s UserServer) UpdateAddresses(_ context.Context, _ *generated.UpdateAddressRequest) (*generated.UpdateAddressResponse, error) {
-	return nil, nil
+func (s UserServer) UpdateAddresses(ctx context.Context, request *generated.UpdateAddressRequest) (*generated.UpdateAddressResponse, error) {
+	u := GetUser(ctx)
+	address := &user.Address{
+		ID:           int(request.Address.Id),
+		UserID:       u.ID,
+		AddressLine1: request.Address.AddressLine_1,
+		AddressLine2: request.Address.AddressLine_2,
+		City:         request.Address.City,
+		State:        request.Address.State,
+		ZipCode:      request.Address.ZipCode,
+		Country:      request.Address.Country,
+	}
+	if address.AddressLine1 == "" || address.City == "" || address.Country == "" {
+		return &generated.UpdateAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "missing params",
+			},
+		}, nil
+	}
+	ok := s.service.UpdateAddress(address)
+	if !ok {
+		return &generated.UpdateAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "something went wrong",
+			},
+		}, nil
+	}
+	return &generated.UpdateAddressResponse{
+		Address: addressToProto(address),
+		ResponseStatus: &generated.ResponseStatus{
+			Success: true,
+		},
+	}, nil
 }
-func (s UserServer) DeleteAddresses(_ context.Context, _ *generated.DeleteAddressRequest) (*generated.DeleteAddressResponse, error) {
-	return nil, nil
+func (s UserServer) DeleteAddresses(ctx context.Context, request *generated.DeleteAddressRequest) (*generated.DeleteAddressResponse, error) {
+	if request.AddressId == 0 {
+		return &generated.DeleteAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "missing address ID",
+			},
+		}, nil
+	}
+	if ok := s.service.DeleteAddress(int(request.AddressId)); !ok {
+		return &generated.DeleteAddressResponse{
+			ResponseStatus: &generated.ResponseStatus{
+				Success: false,
+				Message: "something went wrong",
+			},
+		}, nil
+	}
+	return &generated.DeleteAddressResponse{
+		ResponseStatus: &generated.ResponseStatus{
+			Success: true,
+		},
+	}, nil
 }
 
 func userToProto(user *user.User) *generated.User {
@@ -115,5 +218,18 @@ func userToProto(user *user.User) *generated.User {
 		Email:       user.Email,
 		Name:        user.Name,
 		PhoneNumber: user.PhoneNumber,
+	}
+}
+
+func addressToProto(address *user.Address) *generated.Address {
+	return &generated.Address{
+		Id:            int64(address.ID),
+		UserId:        int64(address.UserID),
+		AddressLine_1: address.AddressLine1,
+		AddressLine_2: address.AddressLine2,
+		Country:       address.Country,
+		City:          address.City,
+		State:         address.State,
+		ZipCode:       address.ZipCode,
 	}
 }

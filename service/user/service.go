@@ -102,3 +102,19 @@ func validPassword(hash, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
+
+func (s *Service) GetAddresses(userID int) (map[int]Address, error) {
+	return s.repo.fetchAddresses(userID)
+}
+
+func (s *Service) CreateAddress(address *Address) (*Address, bool) {
+	return s.repo.insertAddress(address)
+}
+
+func (s *Service) UpdateAddress(address *Address) bool {
+	return s.repo.updateAddress(address)
+}
+
+func (s *Service) DeleteAddress(addressID int) bool {
+	return s.repo.deleteAddress(addressID)
+}

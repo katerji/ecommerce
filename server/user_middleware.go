@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/katerji/ecommerce/proto_out/generated"
 	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
 	"google.golang.org/grpc"
@@ -10,7 +11,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func AuthInterceptor(ctx context.Context, req any, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func AuthInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	for _, r := range getAnonymousRoutes() {
+		if info.FullMethod == r {
+			return handler(ctx, req)
+		}
+	}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
@@ -63,3 +69,10 @@ func GetUser(ctx context.Context) *user.User {
 type userContextKeyType string
 
 const userContextKey userContextKeyType = "user"
+
+func getAnonymousRoutes() []string {
+	return []string{
+		generated.UserService_Signup_FullMethodName,
+		generated.UserService_Login_FullMethodName,
+	}
+}
