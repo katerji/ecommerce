@@ -40,30 +40,34 @@ func (s *Service) validateToken(token, jwtSecret string) (*User, error) {
 
 }
 
-func (s *Service) createJwt(user *User) (string, error) {
+func (s *Service) createJwt(user *User) (*JWTPair, error) {
+	accessTokenExpiry := getJWTExpiry()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
 		"expires_at": getJWTExpiry(),
 	})
 	jwtSecret := envs.GetInstance().GetJWTSecret()
-	tokenString, err := token.SignedString([]byte(jwtSecret))
+	accessToken, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return tokenString, nil
-}
 
-func (s *Service) createRefreshJwt(user *User) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	refreshTokenExpiry := getJWTRefreshExpiry()
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user":       user,
-		"expires_at": getJWTRefreshExpiry(),
+		"expires_at": refreshTokenExpiry,
 	})
-	jwtSecret := envs.GetInstance().GetJWTRefreshSecret()
-	tokenString, err := token.SignedString([]byte(jwtSecret))
+	refreshSecret := envs.GetInstance().GetJWTRefreshSecret()
+	refreshTokenString, err := refreshToken.SignedString([]byte(refreshSecret))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return tokenString, nil
+	return &JWTPair{
+		AccessToken:      accessToken,
+		ExpiresAt:        accessTokenExpiry,
+		RefreshToken:     refreshTokenString,
+		RefreshExpiresAt: refreshTokenExpiry,
+	}, nil
 }
 
 func getJWTExpiry() int64 {

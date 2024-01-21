@@ -1,10 +1,10 @@
 package user
 
 type User struct {
-	ID          int
-	Email       string
-	Name        string
-	PhoneNumber string
+	ID          int    `json:"id"`
+	Email       string `json:"email"`
+	Name        string `json:"name"`
+	PhoneNumber string `json:"phone_number"`
 }
 
 type dbUser struct {
@@ -58,10 +58,14 @@ func (a dbAddress) ToModel() any {
 	}
 }
 
-type SignupResult struct {
-	User                  *User
-	AccessToken           string
-	ExpiresAt             string
-	RefreshToken          string
-	RefreshTokenExpiresAt string
+type JWTPair struct {
+	AccessToken      string `json:"access_token"`
+	ExpiresAt        int64  `json:"expires_at"`
+	RefreshToken     string `json:"refresh_token"`
+	RefreshExpiresAt int64  `json:"refresh_expires_at"`
+}
+
+type LoginResult struct {
+	User    *User
+	jwtPair *JWTPair
 }

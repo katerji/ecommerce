@@ -15,11 +15,47 @@ func New() *Service {
 	}
 }
 
-func (s *Service) GetUserByEmail(email string) (*User, bool) {
+func (s *Service) getUserByEmail(email string) (*User, bool) {
 	return s.repo.fetchUserByEmail(email)
 }
 
-func (s *Service) Signup(user *User, password string) (*SignupResult, error) {
+func (s *Service) getUserByPhoneNumber(phoneNumber string) (*User, bool) {
+	return s.repo.fetchUserByPhoneNumber(phoneNumber)
+}
+
+func (s *Service) LoginWithEmail(email string) (*LoginResult, error) {
+	user, ok := s.getUserByEmail(email)
+	if !ok || user == nil {
+
+	}
+
+	pair, err := s.createJwt(user)
+	if err != nil {
+		return nil, err
+	}
+	return &LoginResult{
+		User:    user,
+		jwtPair: pair,
+	}, nil
+}
+
+func (s *Service) LoginWithPhoneNumber(phoneNumber string) (*LoginResult, error) {
+	user, ok := s.getUserByPhoneNumber(phoneNumber)
+	if !ok || user == nil {
+		return nil, errors.New("account not found")
+	}
+
+	pair, err := s.createJwt(user)
+	if err != nil {
+		return nil, err
+	}
+	return &LoginResult{
+		User:    user,
+		jwtPair: pair,
+	}, nil
+}
+
+func (s *Service) Signup(user *User, password string) (*LoginResult, error) {
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return nil, err
@@ -28,21 +64,14 @@ func (s *Service) Signup(user *User, password string) (*SignupResult, error) {
 	if !ok {
 		return nil, errors.New("failed to create user")
 	}
-	jwt, err := s.createJwt(user)
-	if err != nil {
-		return nil, err
-	}
-	refreshJWT, err := s.createRefreshJwt(user)
+	jwtPair, err := s.createJwt(user)
 	if err != nil {
 		return nil, err
 	}
 
-	return &SignupResult{
-		User:                  user,
-		AccessToken:           jwt,
-		ExpiresAt:             "1",
-		RefreshToken:          refreshJWT,
-		RefreshTokenExpiresAt: "3",
+	return &LoginResult{
+		User:    user,
+		jwtPair: jwtPair,
 	}, nil
 }
 
