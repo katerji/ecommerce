@@ -16,7 +16,7 @@ type Client struct {
 
 var instance *Client
 
-func GetDbInstance() *Client {
+func getDbInstance() *Client {
 	if instance == nil {
 		instance, _ = getDbClient()
 	}
@@ -44,41 +44,12 @@ func getDbClient() (*Client, error) {
 	}, nil
 }
 
-func Init() {
-	client := GetDbInstance()
-	err := client.Ping()
-	if err != nil {
-		panic(err)
-	}
-}
-
 type Reader interface {
 	ToStruct() any
 }
 
-type dbUser struct {
-	ID    uint   `db:"id"`
-	Name  string `db:"name"`
-	Email string `db:"email"`
-}
-
-type user struct {
-	ID    uint
-	Name  string
-	Email string
-}
-
-func (u dbUser) ToStruct() any {
-	return user{
-		ID:    u.ID,
-		Name:  u.Name,
-		Email: u.Email,
-	}
-
-}
-
 func Fetch[T Reader, W any](query string, args ...any) []W {
-	client := GetDbInstance()
+	client := getDbInstance()
 
 	var dbModels []T
 
@@ -98,7 +69,7 @@ func Fetch[T Reader, W any](query string, args ...any) []W {
 }
 
 func FetchOne[T Reader, W any](query string, args ...any) W {
-	client := GetDbInstance()
+	client := getDbInstance()
 
 	var dbModel T
 	err := client.Get(&dbModel, query, args...)
@@ -110,7 +81,7 @@ func FetchOne[T Reader, W any](query string, args ...any) W {
 }
 
 func Insert(query string, args ...any) int64 {
-	client := GetDbInstance()
+	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
@@ -131,7 +102,7 @@ func Insert(query string, args ...any) int64 {
 }
 
 func Update(query string, args ...any) bool {
-	client := GetDbInstance()
+	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
@@ -152,7 +123,7 @@ func Update(query string, args ...any) bool {
 }
 
 func Delete(query string, args ...any) bool {
-	client := GetDbInstance()
+	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)

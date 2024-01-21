@@ -17,6 +17,26 @@ func TestClient(t *testing.T) {
 
 }
 
+type dbUser struct {
+	ID    uint   `db:"id"`
+	Name  string `db:"name"`
+	Email string `db:"email"`
+}
+
+type user struct {
+	ID    uint
+	Name  string
+	Email string
+}
+
+func (u dbUser) ToStruct() any {
+	return user{
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
+	}
+
+}
 func TestFetch(t *testing.T) {
 	users := Fetch[dbUser, user]("SELECT id, email FROM user LIMIT 50")
 	for _, u := range users {
