@@ -6,10 +6,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-type UserServer struct {
-	user.UnimplementedUserServiceServer
-}
-
 func main() {
 	s := grpc.NewServer()
 	user.RegisterUserServiceServer(s, server.NewUserServer())
