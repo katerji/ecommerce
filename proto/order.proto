@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ecommerce;
 
-option go_package = "order/";
+option go_package = "generated/";
 
 import "response.proto";
 import "cart.proto";
