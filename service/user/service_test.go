@@ -92,5 +92,4 @@ func TestService_VerifyJWT(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to verify refresh token with err: %v", err)
 	}
-
 }
