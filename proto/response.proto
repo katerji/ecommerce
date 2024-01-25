@@ -2,7 +2,7 @@ syntax="proto3";
 
 package ecommerce;
 
-option go_package = ".";
+option go_package = "generated/";
 
 message ResponseStatus {
   bool success = 1;

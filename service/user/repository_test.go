@@ -28,9 +28,9 @@ func randomAddress(userID int) *Address {
 
 func TestInsertUser(t *testing.T) {
 	user := randomUser()
-	newUser, ok := repo{}.insertUser(&user, "pass")
-	if !ok {
-		t.Fatal("failed to insert user")
+	newUser, err := repo{}.insertUser(&user, "pass")
+	if err != nil {
+		t.Fatalf("%v", err)
 	}
 
 	if newUser.Email != user.Email {
@@ -49,10 +49,12 @@ func TestInsertUser(t *testing.T) {
 func TestSelectByEmail(t *testing.T) {
 	user := randomUser()
 	r := repo{}
-	r.insertUser(&user, "pass")
-
-	fetchedUser, ok := r.fetchUserByEmail(user.Email)
-	if !ok {
+	_, err := r.insertUser(&user, "pass")
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	fetchedUser, err := r.fetchUserByEmail(user.Email)
+	if err != nil {
 		t.Fatalf("failed to fetch user by email")
 	}
 
@@ -75,9 +77,9 @@ func TestSelectByPhoneNumber(t *testing.T) {
 	r := repo{}
 	r.insertUser(&user, "pass")
 
-	fetchedUser, ok := r.fetchUserByPhoneNumber(user.PhoneNumber)
-	if !ok {
-		t.Fatalf("failed to fetch user by email")
+	fetchedUser, err := r.fetchUserByPhoneNumber(user.PhoneNumber)
+	if err != nil {
+		t.Fatalf("failed to fetch user by email, err := %v", err)
 	}
 
 	if fetchedUser.Email != user.Email {
@@ -113,9 +115,9 @@ func Test_repo_insertAddress(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			re := repo{}
-			ad, got := re.insertAddress(tt.expectedAddress)
-			if got != tt.want {
-				t.Errorf("insertAddress() = %v, want %v", got, tt.want)
+			ad, err := re.insertAddress(tt.expectedAddress)
+			if err != nil {
+				t.Errorf("insertAddress() = %v, want %v", err, tt.want)
 			}
 			allAddresses, err := re.fetchAddresses(tt.expectedAddress.UserID)
 			if err != nil {

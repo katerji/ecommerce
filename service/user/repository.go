@@ -6,28 +6,28 @@ import (
 
 type repo struct{}
 
-func (repo) fetchUserByEmail(email string) (*UserWithPass, bool) {
-	user, ok := db.FetchOne[dbUser, UserWithPass](fetchUserByEmailQuery, email)
-	return &user, ok
+func (repo) fetchUserByEmail(email string) (*UserWithPass, error) {
+	user, err := db.FetchOne[dbUser, UserWithPass](fetchUserByEmailQuery, email)
+	return &user, err
 }
 
-func (repo) fetchUserByPhoneNumber(phoneNumber string) (*UserWithPass, bool) {
-	user, ok := db.FetchOne[dbUser, UserWithPass](fetchUserByPhoneNumberQuery, phoneNumber)
-	return &user, ok
+func (repo) fetchUserByPhoneNumber(phoneNumber string) (*UserWithPass, error) {
+	user, err := db.FetchOne[dbUser, UserWithPass](fetchUserByPhoneNumberQuery, phoneNumber)
+	return &user, err
 }
 
-func (repo) insertUser(user *User, password string) (*User, bool) {
-	userID, ok := db.Insert(insertUserQuery, user.Name, user.Email, user.PhoneNumber, password)
+func (repo) insertUser(user *User, password string) (*User, error) {
+	userID, err := db.Insert(insertUserQuery, user.Name, user.Email, user.PhoneNumber, password)
 	user.ID = userID
 
-	return user, ok
+	return user, err
 }
 
-func (repo) insertAddress(address *Address) (*Address, bool) {
-	addressID, ok := db.Insert(insertAddressQuery, address.UserID, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode)
+func (repo) insertAddress(address *Address) (*Address, error) {
+	addressID, err := db.Insert(insertAddressQuery, address.UserID, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode)
 	address.ID = addressID
 
-	return address, ok
+	return address, err
 }
 
 func (repo) updateAddress(address *Address) bool {

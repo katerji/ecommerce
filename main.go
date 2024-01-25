@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/katerji/ecommerce/generated/generated"
+	"github.com/katerji/ecommerce/proto_out/generated"
 	"github.com/katerji/ecommerce/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

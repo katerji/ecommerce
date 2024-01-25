@@ -45,7 +45,7 @@ CREATE TABLE item
 CREATE TABLE cart
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id    BIGINT,
+    user_id    BIGINT UNIQUE,
     created_on DATETIME,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );
@@ -56,7 +56,8 @@ CREATE TABLE cart_item
     item_id  BIGINT,
     quantity INT,
     FOREIGN KEY (cart_id) REFERENCES cart (id),
-    FOREIGN KEY (item_id) REFERENCES item (id)
+    FOREIGN KEY (item_id) REFERENCES item (id),
+    UNIQUE (cart_id, item_id)
 );
 
 CREATE TABLE `order`

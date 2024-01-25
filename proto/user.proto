@@ -1,9 +1,9 @@
-//protoc --go_out=proto_out --go-grpc_out=generated --proto_path=proto proto/*.proto
+//protoc --go_out=proto_out --go-grpc_out=proto_out --proto_path=proto proto/*.proto
 syntax = "proto3";
 
 package ecommerce;
 
-option go_package = ".";
+option go_package = "generated/";
 
 import "response.proto";
 

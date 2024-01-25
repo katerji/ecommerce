@@ -19,17 +19,17 @@ func (s *Service) InitService() {
 	s.repo = &repo{}
 }
 
-func (s *Service) getUserByEmail(email string) (*UserWithPass, bool) {
+func (s *Service) getUserByEmail(email string) (*UserWithPass, error) {
 	return s.repo.fetchUserByEmail(email)
 }
 
-func (s *Service) getUserByPhoneNumber(phoneNumber string) (*UserWithPass, bool) {
+func (s *Service) getUserByPhoneNumber(phoneNumber string) (*UserWithPass, error) {
 	return s.repo.fetchUserByPhoneNumber(phoneNumber)
 }
 
 func (s *Service) LoginWithEmail(email string, password string) (*LoginResult, error) {
-	userWithPass, ok := s.getUserByEmail(email)
-	if !ok || userWithPass == nil {
+	userWithPass, err := s.getUserByEmail(email)
+	if err != nil || userWithPass == nil {
 		return nil, emailNotFoundErr
 	}
 
@@ -49,8 +49,8 @@ func (s *Service) LoginWithEmail(email string, password string) (*LoginResult, e
 }
 
 func (s *Service) LoginWithPhoneNumber(phoneNumber string, password string) (*LoginResult, error) {
-	userWithPass, ok := s.getUserByPhoneNumber(phoneNumber)
-	if !ok || userWithPass == nil {
+	userWithPass, err := s.getUserByPhoneNumber(phoneNumber)
+	if err != nil || userWithPass == nil {
 		return nil, phoneNumberNotFoundErr
 	}
 
@@ -74,8 +74,8 @@ func (s *Service) Signup(user *User, password string) (*LoginResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	user, ok := s.createUser(user, hashedPassword)
-	if !ok {
+	user, err = s.createUser(user, hashedPassword)
+	if err != nil {
 		return nil, errors.New("failed to create user")
 	}
 	jwtPair, err := s.createJwt(user)
@@ -89,7 +89,7 @@ func (s *Service) Signup(user *User, password string) (*LoginResult, error) {
 	}, nil
 }
 
-func (s *Service) createUser(user *User, password string) (*User, bool) {
+func (s *Service) createUser(user *User, password string) (*User, error) {
 	return s.repo.insertUser(user, password)
 }
 
@@ -107,7 +107,7 @@ func (s *Service) GetAddresses(userID int) (map[int]Address, error) {
 	return s.repo.fetchAddresses(userID)
 }
 
-func (s *Service) CreateAddress(address *Address) (*Address, bool) {
+func (s *Service) CreateAddress(address *Address) (*Address, error) {
 	return s.repo.insertAddress(address)
 }
 

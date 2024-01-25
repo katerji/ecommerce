@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/katerji/ecommerce/generated/generated"
+	"github.com/katerji/ecommerce/proto_out/generated"
 	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
 )
@@ -136,8 +136,8 @@ func (s UserServer) CreateAddresses(ctx context.Context, request *generated.Crea
 			},
 		}, nil
 	}
-	insertedAddress, ok := s.service.CreateAddress(address)
-	if !ok {
+	insertedAddress, err := s.service.CreateAddress(address)
+	if err != nil {
 		return &generated.CreateAddressResponse{
 			ResponseStatus: &generated.ResponseStatus{
 				Success: false,

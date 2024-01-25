@@ -64,37 +64,37 @@ func Fetch[T Reader, W any](query string, args ...any) ([]W, error) {
 	return returns, nil
 }
 
-func FetchOne[T Reader, W any](query string, args ...any) (W, bool) {
+func FetchOne[T Reader, W any](query string, args ...any) (W, error) {
 	client := getDbInstance()
 
 	var dbModel T
 	err := client.Get(&dbModel, query, args...)
 	if err != nil {
 		fmt.Println(err)
-		return dbModel.ToModel().(W), false
+		return dbModel.ToModel().(W), err
 	}
-	return dbModel.ToModel().(W), true
+	return dbModel.ToModel().(W), nil
 }
 
-func Insert(query string, args ...any) (int, bool) {
+func Insert(query string, args ...any) (int, error) {
 	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0, false
+		return 0, err
 	}
 	result, err := prepare.Exec(args...)
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0, false
+		return 0, err
 	}
 	insertID, err := result.LastInsertId()
 	if err != nil {
 		fmt.Printf("err inserting: %v", err)
-		return 0, false
+		return 0, err
 	}
 
-	return int(insertID), true
+	return int(insertID), nil
 }
 
 func Update(query string, args ...any) bool {
