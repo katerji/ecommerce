@@ -2,12 +2,13 @@ syntax = "proto3";
 
 package ecommerce;
 
-option go_package = "generated/";
+option go_package = ".";
 
 import "response.proto";
 
 service CartService {
   rpc GetCategories(GetCategoriesRequest) returns (GetCategoriesResponse);
+  rpc CreateCart(CreateCartRequest) returns (CreateCartResponse);
   rpc GetCart(GetCartRequest) returns (GetCartResponse);
   rpc AddItem(AddItemRequest) returns (AddItemResponse);
   rpc DeleteItem(DeleteItemRequest) returns (DeleteItemRequest);
@@ -23,6 +24,7 @@ message GetCartRequest {}
 
 message GetCartResponse {
   Cart cart = 1;
+  ResponseStatus response_status = 2;
 }
 
 message AddItemRequest {
@@ -38,6 +40,7 @@ message AddItemResponse {
 message DeleteItemRequest {
   string item_id = 1;
   string cart_id = 2;
+  ResponseStatus response_status = 3;
 }
 
 message DeleteItemResponse {
@@ -62,6 +65,14 @@ message GetCategoriesRequest {}
 
 message GetCategoriesResponse {
   repeated Category category = 1;
+  ResponseStatus response_status = 2;
+}
+
+
+message CreateCartRequest {}
+
+message CreateCartResponse {
+  Cart cart = 1;
   ResponseStatus response_status = 2;
 }
 

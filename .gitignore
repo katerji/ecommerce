@@ -1,4 +1,4 @@
 .env
 .idea/
-proto_out/*
-!proto_out/
+generated/*
+!generated/

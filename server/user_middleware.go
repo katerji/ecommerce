@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/katerji/ecommerce/proto_out/generated"
+	"github.com/katerji/ecommerce/generated/generated"
 	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
 	"google.golang.org/grpc"
