@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -9,6 +11,8 @@ import (
 	_ "testing"
 	"time"
 )
+
+var ErrNoRows = errors.New("no rows found")
 
 type Client struct {
 	*sqlx.DB
@@ -56,6 +60,9 @@ func Fetch[T Reader, W any](query string, args ...any) ([]W, error) {
 		return nil, err
 	}
 
+	if len(dbModels) == 0 {
+		return nil, ErrNoRows
+	}
 	var returns []W
 	for _, m := range dbModels {
 		returns = append(returns, m.ToModel().(W))
@@ -69,9 +76,9 @@ func FetchOne[T Reader, W any](query string, args ...any) (W, error) {
 
 	var dbModel T
 	err := client.Get(&dbModel, query, args...)
-	if err != nil {
+	if !errors.Is(err, sql.ErrNoRows) {
 		fmt.Println(err)
-		return dbModel.ToModel().(W), err
+		return dbModel.ToModel().(W), ErrNoRows
 	}
 	return dbModel.ToModel().(W), nil
 }
@@ -97,44 +104,44 @@ func Insert(query string, args ...any) (int, error) {
 	return int(insertID), nil
 }
 
-func Update(query string, args ...any) bool {
+func Update(query string, args ...any) error {
 	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 	result, err := prepare.Exec(args...)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 	_, err = result.RowsAffected()
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
-func Delete(query string, args ...any) bool {
+func Delete(query string, args ...any) error {
 	client := getDbInstance()
 	prepare, err := client.Prepare(query)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 	result, err := prepare.Exec(args...)
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 	_, err = result.RowsAffected()
 	if err != nil {
 		fmt.Printf("err updating: %v", err)
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }

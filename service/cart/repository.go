@@ -1,6 +1,10 @@
 package cart
 
-import "github.com/katerji/ecommerce/db"
+import (
+	"database/sql"
+	"errors"
+	"github.com/katerji/ecommerce/db"
+)
 
 type repository struct{}
 
@@ -21,11 +25,14 @@ func (r *repository) fetchCategoryItems(categoryID int, page int) ([]Item, error
 func (r *repository) fetchCart(userID int) (*Cart, error) {
 	cart, err := db.FetchOne[dbCart, Cart](fetchCartByUserIDQuery, userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return r.createCart(userID)
+		}
 		return nil, err
 	}
 
 	cartItems, err := db.Fetch[dbCartItem, CartItem](fetchCartItemsByCartIDQuery, cart.ID)
-	if err != nil {
+	if err != nil && !errors.Is(err, db.ErrNoRows) {
 		return nil, err
 	}
 	cart.CartItems = cartItems
@@ -50,4 +57,23 @@ func (r *repository) addItemToCart(cartID, itemID, quantity int) error {
 	_, err := db.Insert(addItemToCartQuery, cartID, itemID, quantity)
 
 	return err
+}
+
+func (r *repository) removeItemFromCart(cartID, itemID int) error {
+	cartItem, err := db.FetchOne[dbCartItem, CartItem](fetchCartItemQuantityQuery, cartID, itemID)
+	if err != nil {
+		if errors.Is(err, db.ErrNoRows) {
+			return nil
+		}
+		return err
+	}
+	if cartItem.InCartQuantity == 0 {
+		return db.Delete(deleteItemFromCartQuery, cartID, itemID)
+	}
+
+	return db.Update(removeItemFromCartQuery, cartID, itemID)
+}
+
+func (r *repository) clearCart(cartID int) error {
+	return db.Update(clearCartQuery, cartID)
 }

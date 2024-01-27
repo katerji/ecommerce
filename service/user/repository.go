@@ -30,11 +30,11 @@ func (repo) insertAddress(address *Address) (*Address, error) {
 	return address, err
 }
 
-func (repo) updateAddress(address *Address) bool {
+func (repo) updateAddress(address *Address) error {
 	return db.Update(updateAddressQuery, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode, address.ID)
 }
 
-func (repo) deleteAddress(addressID int) bool {
+func (repo) deleteAddress(addressID int) error {
 	return db.Delete(deleteAddressQuery, addressID)
 }
 

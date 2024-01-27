@@ -12,4 +12,8 @@ const (
 	fetchCartItemsByCartIDQuery = "SELECT ci.cart_id, ci.item_id, ci.quantity, i.name as item_name, i.price FROM cart_item ci JOIN item i ON ci.item_id = i.id WHERE cart_id = ?"
 	createCartQuery             = "INSERT INTO cart (user_id) VALUES (?)"
 	addItemToCartQuery          = "INSERT INTO cart_item (cart_id, item_id, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)"
+	fetchCartItemQuantityQuery  = "SELECT quantity FROM WHERE cart_id = ? AND item_id = ?"
+	removeItemFromCartQuery     = "UPDATE cart_item SET quantity = quantity - 1 WHERE cart_id = ? AND item_id = ?"
+	deleteItemFromCartQuery     = "DELETE FROM cart_item WHERE cart_id = ? AND item_id = ?"
+	clearCartQuery              = "DELETE FROM cart_item WHERE cart_id = ?"
 )

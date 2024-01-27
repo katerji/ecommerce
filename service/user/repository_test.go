@@ -192,8 +192,8 @@ func Test_repo_updateAddress(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			re := repo{}
-			if got := re.updateAddress(tt.expectedAddress); got != tt.want {
-				t.Errorf("updateAddress() = %v, want %v", got, tt.want)
+			if err := re.updateAddress(tt.expectedAddress); err != nil {
+				t.Errorf("updateAddress() err = %v", err)
 			}
 			allAddresses, err := re.fetchAddresses(tt.expectedAddress.UserID)
 			if err != nil {
@@ -249,9 +249,9 @@ func Test_repo_deleteAddress(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			re := repo{}
 			ad, _ := re.insertAddress(tt.expectedAddress)
-			got := re.deleteAddress(ad.ID)
-			if got != tt.want {
-				t.Errorf("insertAddress() = %v, want %v", got, tt.want)
+			err := re.deleteAddress(ad.ID)
+			if err != nil {
+				t.Errorf("insertAddress() err = %v", err)
 			}
 		})
 	}
