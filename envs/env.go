@@ -16,6 +16,7 @@ const (
 	defaultJWTExpiry        = "86400"
 	defaultRefreshJWTSecret = "dummy_refresh"
 	defaultRefreshJWTExpiry = "1209600"
+	defaultServer           = "user"
 )
 
 type env struct {
@@ -28,6 +29,7 @@ type env struct {
 	dbUser           string
 	dbPort           string
 	dbName           string
+	server           string
 }
 
 func getFromEnv(key string, defaultValue string) string {
@@ -50,42 +52,47 @@ func newEnv() *env {
 		dbUser:           getFromEnv("DB_USERNAME", defaultDBUser),
 		dbPort:           getFromEnv("DB_PORT", defaultDBPort),
 		dbName:           getFromEnv("DB_DATABASE", defaultDBDatabase),
+		server:           getFromEnv("server", defaultServer),
 	}
 }
 
-func (env *env) GetJWTSecret() string {
+func (env *env) JWTSecret() string {
 	return env.jwtSecret
 }
 
-func (env *env) GetJWTExpiry() string {
+func (env *env) JWTExpiry() string {
 	return env.jwtExpiry
 }
 
-func (env *env) GetJWTRefreshSecret() string {
+func (env *env) JWTRefreshSecret() string {
 	return env.jwtRefreshSecret
 }
 
-func (env *env) GetJWTRefreshExpiry() string {
+func (env *env) JWTRefreshExpiry() string {
 	return env.jwtRefreshExpiry
 }
 
-func (env *env) GetDbHost() string {
+func (env *env) DbHost() string {
 	return env.dbHost
 }
 
-func (env *env) GetDbPassword() string {
+func (env *env) DbPassword() string {
 	return env.dbPassword
 }
 
-func (env *env) GetDbUser() string {
+func (env *env) DbUser() string {
 	return env.dbUser
 }
 
-func (env *env) GetDbPort() string {
+func (env *env) DbPort() string {
 	return env.dbPort
 }
 
-func (env *env) GetDbName() string {
+func (env *env) DbName() string {
+	return env.dbName
+}
+
+func (env *env) Server() string {
 	return env.dbName
 }
 

@@ -2,23 +2,48 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/katerji/ecommerce/proto_out/generated"
 	"github.com/katerji/ecommerce/service"
 	"github.com/katerji/ecommerce/service/user"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	"log"
+	"net"
 )
 
-type UserServer struct {
+type userMicroservice struct{}
+
+func (u userMicroservice) StartGRPCServer() {
+	s := grpc.NewServer(grpc.UnaryInterceptor(authInterceptor))
+	generated.RegisterUserServiceServer(s, newUserGRPCServer())
+
+	lis, err := net.Listen("tcp", ":9999")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	reflection.Register(s)
+
+	fmt.Printf("Server is listening on %s...\n", ":9999")
+
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+}
+
+type userGRPCServer struct {
 	service *user.Service
 	generated.UnimplementedUserServiceServer
 }
 
-func NewUserServer() UserServer {
-	return UserServer{
-		service: service.GetServiceContainerInstance().UserServer,
+func newUserGRPCServer() userGRPCServer {
+	return userGRPCServer{
+		service: service.GetServiceContainerInstance().UserService,
 	}
 }
 
-func (s UserServer) Login(_ context.Context, request *generated.LoginRequest) (*generated.LoginResponse, error) {
+func (s userGRPCServer) Login(_ context.Context, request *generated.LoginRequest) (*generated.LoginResponse, error) {
 	if request.Email == "" && request.PhoneNumber == "" {
 		return &generated.LoginResponse{
 			Success: false,
@@ -59,7 +84,7 @@ func (s UserServer) Login(_ context.Context, request *generated.LoginRequest) (*
 	}, nil
 }
 
-func (s UserServer) Signup(_ context.Context, request *generated.SignupRequest) (*generated.SignupResponse, error) {
+func (s userGRPCServer) Signup(_ context.Context, request *generated.SignupRequest) (*generated.SignupResponse, error) {
 	isOneSet := request.Email != "" || request.PhoneNumber != ""
 	if !isOneSet || request.Name == "" || request.Password == "" {
 		return &generated.SignupResponse{
@@ -89,11 +114,11 @@ func (s UserServer) Signup(_ context.Context, request *generated.SignupRequest) 
 	}, nil
 }
 
-func (s UserServer) Logout(_ context.Context, _ *generated.LogoutRequest) (*generated.LogoutResponse, error) {
+func (s userGRPCServer) Logout(_ context.Context, _ *generated.LogoutRequest) (*generated.LogoutResponse, error) {
 	return nil, nil
 }
 
-func (s UserServer) GetAddresses(ctx context.Context, _ *generated.GetAddressesRequest) (*generated.GetAddressesResponse, error) {
+func (s userGRPCServer) GetAddresses(ctx context.Context, _ *generated.GetAddressesRequest) (*generated.GetAddressesResponse, error) {
 	u := GetUser(ctx)
 	addressesMap, err := s.service.GetAddresses(u.ID)
 	if err != nil {
@@ -117,7 +142,7 @@ func (s UserServer) GetAddresses(ctx context.Context, _ *generated.GetAddressesR
 	}, nil
 }
 
-func (s UserServer) CreateAddresses(ctx context.Context, request *generated.CreateAddressRequest) (*generated.CreateAddressResponse, error) {
+func (s userGRPCServer) CreateAddresses(ctx context.Context, request *generated.CreateAddressRequest) (*generated.CreateAddressResponse, error) {
 	u := GetUser(ctx)
 	address := &user.Address{
 		UserID:       u.ID,
@@ -152,7 +177,7 @@ func (s UserServer) CreateAddresses(ctx context.Context, request *generated.Crea
 		},
 	}, nil
 }
-func (s UserServer) UpdateAddresses(ctx context.Context, request *generated.UpdateAddressRequest) (*generated.UpdateAddressResponse, error) {
+func (s userGRPCServer) UpdateAddresses(ctx context.Context, request *generated.UpdateAddressRequest) (*generated.UpdateAddressResponse, error) {
 	u := GetUser(ctx)
 	address := &user.Address{
 		ID:           int(request.Address.Id),
@@ -172,8 +197,8 @@ func (s UserServer) UpdateAddresses(ctx context.Context, request *generated.Upda
 			},
 		}, nil
 	}
-	ok := s.service.UpdateAddress(address)
-	if !ok {
+	err := s.service.UpdateAddress(address)
+	if err != nil {
 		return &generated.UpdateAddressResponse{
 			ResponseStatus: &generated.ResponseStatus{
 				Success: false,
@@ -188,7 +213,7 @@ func (s UserServer) UpdateAddresses(ctx context.Context, request *generated.Upda
 		},
 	}, nil
 }
-func (s UserServer) DeleteAddresses(ctx context.Context, request *generated.DeleteAddressRequest) (*generated.DeleteAddressResponse, error) {
+func (s userGRPCServer) DeleteAddresses(ctx context.Context, request *generated.DeleteAddressRequest) (*generated.DeleteAddressResponse, error) {
 	if request.AddressId == 0 {
 		return &generated.DeleteAddressResponse{
 			ResponseStatus: &generated.ResponseStatus{
@@ -197,7 +222,7 @@ func (s UserServer) DeleteAddresses(ctx context.Context, request *generated.Dele
 			},
 		}, nil
 	}
-	if ok := s.service.DeleteAddress(int(request.AddressId)); !ok {
+	if err := s.service.DeleteAddress(int(request.AddressId)); err != nil {
 		return &generated.DeleteAddressResponse{
 			ResponseStatus: &generated.ResponseStatus{
 				Success: false,

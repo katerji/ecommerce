@@ -4,41 +4,41 @@ import (
 	"github.com/katerji/ecommerce/db"
 )
 
-type repo struct{}
+type repository struct{}
 
-func (repo) fetchUserByEmail(email string) (*UserWithPass, error) {
+func (repository) fetchUserByEmail(email string) (*UserWithPass, error) {
 	user, err := db.FetchOne[dbUser, UserWithPass](fetchUserByEmailQuery, email)
 	return &user, err
 }
 
-func (repo) fetchUserByPhoneNumber(phoneNumber string) (*UserWithPass, error) {
+func (repository) fetchUserByPhoneNumber(phoneNumber string) (*UserWithPass, error) {
 	user, err := db.FetchOne[dbUser, UserWithPass](fetchUserByPhoneNumberQuery, phoneNumber)
 	return &user, err
 }
 
-func (repo) insertUser(user *User, password string) (*User, error) {
+func (repository) insertUser(user *User, password string) (*User, error) {
 	userID, err := db.Insert(insertUserQuery, user.Name, user.Email, user.PhoneNumber, password)
 	user.ID = userID
 
 	return user, err
 }
 
-func (repo) insertAddress(address *Address) (*Address, error) {
+func (repository) insertAddress(address *Address) (*Address, error) {
 	addressID, err := db.Insert(insertAddressQuery, address.UserID, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode)
 	address.ID = addressID
 
 	return address, err
 }
 
-func (repo) updateAddress(address *Address) error {
+func (repository) updateAddress(address *Address) error {
 	return db.Update(updateAddressQuery, address.AddressLine1, address.AddressLine2, address.Country, address.City, address.State, address.ZipCode, address.ID)
 }
 
-func (repo) deleteAddress(addressID int) error {
+func (repository) deleteAddress(addressID int) error {
 	return db.Delete(deleteAddressQuery, addressID)
 }
 
-func (repo) fetchAddresses(userID int) (map[int]Address, error) {
+func (repository) fetchAddresses(userID int) (map[int]Address, error) {
 	addresses, err := db.Fetch[dbAddress, Address](fetchAddressesQuery, userID)
 	if err != nil {
 		return nil, err

@@ -9,7 +9,7 @@ func TestService_Signup(t *testing.T) {
 	password := "123456"
 
 	s := Service{}
-	s.InitService()
+	s.New()
 
 	_, err := s.Signup(&user, password)
 	if err != nil {
@@ -22,7 +22,7 @@ func TestService_LoginWithEmail(t *testing.T) {
 	p := "11111"
 
 	s := Service{}
-	s.InitService()
+	s.New()
 	result, err := s.Signup(&user, p)
 	if err != nil {
 		t.Errorf("failed to sign up user with err: %v", err)
@@ -52,7 +52,7 @@ func TestService_LoginWithPhone(t *testing.T) {
 	p := "11111"
 
 	s := Service{}
-	s.InitService()
+	s.New()
 	result, err := s.Signup(&user, p)
 	if err != nil {
 		t.Errorf("failed to sign up user with err: %v", err)
@@ -82,7 +82,7 @@ func TestService_VerifyJWT(t *testing.T) {
 	pass := "123"
 
 	s := Service{}
-	s.InitService()
+	s.New()
 
 	result, err := s.Signup(&user, pass)
 	if err != nil {

@@ -28,7 +28,7 @@ func randomAddress(userID int) *Address {
 
 func TestInsertUser(t *testing.T) {
 	user := randomUser()
-	newUser, err := repo{}.insertUser(&user, "pass")
+	newUser, err := repository{}.insertUser(&user, "pass")
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -48,7 +48,7 @@ func TestInsertUser(t *testing.T) {
 
 func TestSelectByEmail(t *testing.T) {
 	user := randomUser()
-	r := repo{}
+	r := repository{}
 	_, err := r.insertUser(&user, "pass")
 	if err != nil {
 		t.Fatalf("%v", err)
@@ -74,7 +74,7 @@ func TestSelectByEmail(t *testing.T) {
 
 func TestSelectByPhoneNumber(t *testing.T) {
 	user := randomUser()
-	r := repo{}
+	r := repository{}
 	r.insertUser(&user, "pass")
 
 	fetchedUser, err := r.fetchUserByPhoneNumber(user.PhoneNumber)
@@ -114,7 +114,7 @@ func Test_repo_insertAddress(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			re := repo{}
+			re := repository{}
 			ad, err := re.insertAddress(tt.expectedAddress)
 			if err != nil {
 				t.Errorf("insertAddress() = %v, want %v", err, tt.want)
@@ -191,7 +191,7 @@ func Test_repo_updateAddress(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			re := repo{}
+			re := repository{}
 			if err := re.updateAddress(tt.expectedAddress); err != nil {
 				t.Errorf("updateAddress() err = %v", err)
 			}
@@ -247,7 +247,7 @@ func Test_repo_deleteAddress(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			re := repo{}
+			re := repository{}
 			ad, _ := re.insertAddress(tt.expectedAddress)
 			err := re.deleteAddress(ad.ID)
 			if err != nil {

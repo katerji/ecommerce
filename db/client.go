@@ -28,11 +28,11 @@ func getDbInstance() *Client {
 }
 
 func getDbClient() (*Client, error) {
-	dbHost := envs.GetInstance().GetDbHost()
-	dbUser := envs.GetInstance().GetDbUser()
-	dbPort := envs.GetInstance().GetDbPort()
-	dbPass := envs.GetInstance().GetDbPassword()
-	dbName := envs.GetInstance().GetDbName()
+	dbHost := envs.GetInstance().DbHost()
+	dbUser := envs.GetInstance().DbUser()
+	dbPort := envs.GetInstance().DbPort()
+	dbPass := envs.GetInstance().DbPassword()
+	dbName := envs.GetInstance().DbName()
 
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 

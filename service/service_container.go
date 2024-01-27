@@ -1,17 +1,18 @@
 package service
 
 import (
+	"github.com/katerji/ecommerce/service/cart"
 	"github.com/katerji/ecommerce/service/user"
 )
 
 type Container struct {
-	UserServer *user.Service
+	UserService *user.Service
+	CartService *cart.Service
 }
 
 func (s *Container) init() {
-	userService := &user.Service{}
-	userService.InitService()
-	s.UserServer = userService
+	s.UserService = user.New()
+	s.CartService = cart.New()
 }
 
 var serviceContainerInstance *Container

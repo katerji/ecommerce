@@ -16,12 +16,12 @@ type claims struct {
 }
 
 func (s *Service) VerifyAccessToken(token string) (*User, error) {
-	jwtSecret := envs.GetInstance().GetJWTSecret()
+	jwtSecret := envs.GetInstance().JWTSecret()
 	return s.validateToken(token, jwtSecret)
 }
 
 func (s *Service) verifyRefreshToken(token string) (*User, error) {
-	jwtSecret := envs.GetInstance().GetJWTRefreshSecret()
+	jwtSecret := envs.GetInstance().JWTRefreshSecret()
 	return s.validateToken(token, jwtSecret)
 }
 
@@ -46,7 +46,7 @@ func (s *Service) createJwt(user *User) (*JWTPair, error) {
 		"user":       user,
 		"expires_at": getJWTExpiry(),
 	})
-	jwtSecret := envs.GetInstance().GetJWTSecret()
+	jwtSecret := envs.GetInstance().JWTSecret()
 	accessToken, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (s *Service) createJwt(user *User) (*JWTPair, error) {
 		"user":       user,
 		"expires_at": refreshTokenExpiry,
 	})
-	refreshSecret := envs.GetInstance().GetJWTRefreshSecret()
+	refreshSecret := envs.GetInstance().JWTRefreshSecret()
 	refreshTokenString, err := refreshToken.SignedString([]byte(refreshSecret))
 	if err != nil {
 		return nil, err
@@ -71,13 +71,13 @@ func (s *Service) createJwt(user *User) (*JWTPair, error) {
 }
 
 func getJWTExpiry() int64 {
-	expiryString := envs.GetInstance().GetJWTExpiry()
+	expiryString := envs.GetInstance().JWTExpiry()
 	expiry, _ := strconv.Atoi(expiryString)
 	return intToUnixTime(expiry)
 }
 
 func getJWTRefreshExpiry() int64 {
-	expiryString := envs.GetInstance().GetJWTRefreshExpiry()
+	expiryString := envs.GetInstance().JWTRefreshExpiry()
 	expiry, _ := strconv.Atoi(expiryString)
 	return intToUnixTime(expiry)
 }

@@ -12,19 +12,21 @@ var (
 )
 
 type Service struct {
-	repo *repo
+	repository *repository
 }
 
-func (s *Service) InitService() {
-	s.repo = &repo{}
+func New() *Service {
+	return &Service{
+		repository: &repository{},
+	}
 }
 
 func (s *Service) getUserByEmail(email string) (*UserWithPass, error) {
-	return s.repo.fetchUserByEmail(email)
+	return s.repository.fetchUserByEmail(email)
 }
 
 func (s *Service) getUserByPhoneNumber(phoneNumber string) (*UserWithPass, error) {
-	return s.repo.fetchUserByPhoneNumber(phoneNumber)
+	return s.repository.fetchUserByPhoneNumber(phoneNumber)
 }
 
 func (s *Service) LoginWithEmail(email string, password string) (*LoginResult, error) {
@@ -90,7 +92,7 @@ func (s *Service) Signup(user *User, password string) (*LoginResult, error) {
 }
 
 func (s *Service) createUser(user *User, password string) (*User, error) {
-	return s.repo.insertUser(user, password)
+	return s.repository.insertUser(user, password)
 }
 
 func hashPassword(password string) (string, error) {
@@ -104,17 +106,17 @@ func validPassword(hash, password string) bool {
 }
 
 func (s *Service) GetAddresses(userID int) (map[int]Address, error) {
-	return s.repo.fetchAddresses(userID)
+	return s.repository.fetchAddresses(userID)
 }
 
 func (s *Service) CreateAddress(address *Address) (*Address, error) {
-	return s.repo.insertAddress(address)
+	return s.repository.insertAddress(address)
 }
 
-func (s *Service) UpdateAddress(address *Address) bool {
-	return s.repo.updateAddress(address)
+func (s *Service) UpdateAddress(address *Address) error {
+	return s.repository.updateAddress(address)
 }
 
-func (s *Service) DeleteAddress(addressID int) bool {
-	return s.repo.deleteAddress(addressID)
+func (s *Service) DeleteAddress(addressID int) error {
+	return s.repository.deleteAddress(addressID)
 }

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func AuthInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func authInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	for _, r := range getAnonymousRoutes() {
 		if info.FullMethod == r {
 			return handler(ctx, req)
@@ -47,7 +47,7 @@ func extractAccessToken(md metadata.MD) string {
 
 // authenticateUser performs authentication logic. Replace it with your own logic.
 func authenticateUser(accessToken string) (*user.User, error) {
-	user, err := service.GetServiceContainerInstance().UserServer.VerifyAccessToken(accessToken)
+	user, err := service.GetServiceContainerInstance().UserService.VerifyAccessToken(accessToken)
 	if err != nil {
 		return nil, err
 	}
