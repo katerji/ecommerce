@@ -24,7 +24,7 @@ func (c cartMicroservice) StartGRPCServer() {
 
 	reflection.Register(s)
 
-	fmt.Printf("Server is listening on %s...\n", ":9999")
+	fmt.Printf("Server is listening on %s...\n", ":9998")
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)

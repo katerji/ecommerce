@@ -52,7 +52,7 @@ func newEnv() *env {
 		dbUser:           getFromEnv("DB_USERNAME", defaultDBUser),
 		dbPort:           getFromEnv("DB_PORT", defaultDBPort),
 		dbName:           getFromEnv("DB_DATABASE", defaultDBDatabase),
-		server:           getFromEnv("server", defaultServer),
+		server:           getFromEnv("SERVER", defaultServer),
 	}
 }
 
@@ -93,7 +93,7 @@ func (env *env) DbName() string {
 }
 
 func (env *env) Server() string {
-	return env.dbName
+	return env.server
 }
 
 var instance *env
